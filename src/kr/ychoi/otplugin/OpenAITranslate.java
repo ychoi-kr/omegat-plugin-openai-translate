@@ -25,7 +25,7 @@ public class OpenAITranslate extends BaseTranslate {
 
     @Override
     protected String getPreferenceName() {
-        return "allow_naver_translate";
+        return "allow_openai_translate";
     }
 
     public String getName() {
