@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OmegaT-Plugin: true
+
+Name: kr.ychoi.otplugin.OpenAITranslate
+OmegaT-Plugin: MachineTranslator
+
