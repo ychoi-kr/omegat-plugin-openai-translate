@@ -52,12 +52,13 @@ public class OpenAITranslate extends BaseTranslate {
         }
 
         String prompt = String.format("Translate below into %s: %s", lvTargetLang, text);
+        String escapedPrompt = prompt.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n");
         
         Map<String, String> headers = new TreeMap<>();
         headers.put("Content-Type", "application/json");
         headers.put("Authorization", "Bearer " + API_KEY);
 
-        String body = String.format("{ \"model\": \"text-davinci-003\", \"prompt\": \"%s\", \"max_tokens\": 500, \"temperature\": 0 }", prompt.replaceAll("\"", "\\\\\""));
+        String body = String.format("{ \"model\": \"text-davinci-003\", \"prompt\": \"%s\", \"max_tokens\": 500, \"temperature\": 0 }", escapedPrompt);
 
         String response = WikiGet.postJSON(API_URL, body, headers);
         JSONObject jsonResponse = new JSONObject(response);
