@@ -29,7 +29,10 @@ This software is open source software licensed under the GNU GPLv2. In addition,
     openai.api.key=YOURAPIKEY
     ```
    
-    - In case of running the program with command line prompt, add this parameter: ```-Dopenai.api.key=YOURAPIKEY```
+    - In case of running the program with command line prompt, add this parameter:
+    ```
+    -Dopenai.api.key=YOURAPIKEY
+    ```
    
 3. Open OmegaT Application. From Options > Machine Translation, select OpenAI Translate.
 
