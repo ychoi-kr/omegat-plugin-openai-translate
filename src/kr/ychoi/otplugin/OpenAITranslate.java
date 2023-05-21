@@ -50,6 +50,15 @@ public class OpenAITranslate extends BaseTranslate {
         if (cachedResult != null) {
             return cachedResult;
         }
+        
+        String model = "text-davinci-003";
+        int max_tokens = 4000;
+//        Below is commented out because of 404 issue.
+//        See https://community.openai.com/t/when-i-try-the-gpt-4-model-chat-completion-in-api-request-i-get-an-error-that-model-does-not-exist/98850
+//        if (text.length() > max_tokens * 0.3) {
+//        	model = "gpt-4";
+//        	max_tokens = 8000;
+//        }
 
         String prompt = String.format("Translate below into %s: %s", lvTargetLang, text);
         String escapedPrompt = prompt.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n");
@@ -58,8 +67,8 @@ public class OpenAITranslate extends BaseTranslate {
         headers.put("Content-Type", "application/json");
         headers.put("Authorization", "Bearer " + API_KEY);
 
-        String body = String.format("{ \"model\": \"text-davinci-003\", \"prompt\": \"%s\", \"max_tokens\": 500, \"temperature\": 0 }", escapedPrompt);
-
+        String body = String.format("{ \"model\": \"%s\", \"prompt\": \"%s\", \"max_tokens\": %d, \"temperature\": 0 }", model, escapedPrompt, max_tokens);
+        System.out.println(body);
         String response = WikiGet.postJSON(API_URL, body, headers);
         JSONObject jsonResponse = new JSONObject(response);
         String translatedText = jsonResponse.getJSONArray("choices").getJSONObject(0).getString("text").trim();
