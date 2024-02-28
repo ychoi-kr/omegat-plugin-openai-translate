@@ -51,7 +51,7 @@ public class OpenAITranslate extends BaseTranslate {
             return cachedResult;
         }
         
-        String model = "text-davinci-003";
+        String model = "gpt-3.5-turbo-instruct";
         int max_tokens = 4000;
 //        Below is commented out because of 404 issue.
 //        See https://community.openai.com/t/when-i-try-the-gpt-4-model-chat-completion-in-api-request-i-get-an-error-that-model-does-not-exist/98850
