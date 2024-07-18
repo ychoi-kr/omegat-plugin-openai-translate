@@ -52,13 +52,7 @@ public class OpenAITranslate extends BaseTranslate {
         }
         
         String model = "gpt-3.5-turbo-instruct";
-        int max_tokens = 4000;
-//        Below is commented out because of 404 issue.
-//        See https://community.openai.com/t/when-i-try-the-gpt-4-model-chat-completion-in-api-request-i-get-an-error-that-model-does-not-exist/98850
-//        if (text.length() > max_tokens * 0.3) {
-//        	model = "gpt-4";
-//        	max_tokens = 8000;
-//        }
+        int max_tokens = 2000;
 
         String prompt = String.format("Translate below into %s: %s", lvTargetLang, text);
         String escapedPrompt = prompt.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n");
