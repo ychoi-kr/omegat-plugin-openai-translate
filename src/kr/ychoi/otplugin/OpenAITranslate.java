@@ -50,7 +50,7 @@ public class OpenAITranslate extends BaseCachedTranslate {
         String lvSourceLang = sLang.getLanguageCode().substring(0, 2).toUpperCase();
         String lvTargetLang = tLang.getLanguageCode().substring(0, 2).toUpperCase();
 
-        String systemPrompt = String.format("You will be provided with a sentence in %s, and your task is to translate it into %s.", lvSourceLang, lvTargetLang);
+        String systemPrompt = String.format("You will be provided with a sentence in %s, and your task is to translate it into %s while preserving tags.", lvSourceLang, lvTargetLang);
         String userPrompt = text;
 
         messages.put(new JSONObject().put("role", "system").put("content", systemPrompt));
