@@ -9,15 +9,15 @@ This software is open source software licensed under the GNU GPLv2. In addition,
 
 ## How to use
 
-0. Get your API key from [OpenAI](https://platform.openai.com/account/api-keys).
+1. Get your API key from [OpenAI](https://platform.openai.com/account/api-keys).
 
-1. Copy the plug-in file into directory:
+2. Copy the plug-in file into directory:
 
     - Windows: Copy the plug-in file into %SystemDrive%%ProgramFiles%\OmegaT\plugins directory.
     - macOS: Copy the plug-in file into /Applications/OmegaT.app/Contents/Java/plugins directory.
     - GNU/Linux: Copy the plug-in file under the directory that OmegaT installed.
 
-2. Set your OpenAI key.
+3. Set your OpenAI key.
 
     - Windows: Open the file %SystemDrive%\%ProgramFiles%\OmegaT\OmegaT.I4J.ini and add this line:
     ```
@@ -34,8 +34,28 @@ This software is open source software licensed under the GNU GPLv2. In addition,
     -Dopenai.api.key=YOURAPIKEY
     ```
    
-3. Open OmegaT Application. From Options > Machine Translation, select OpenAI Translate.
+4. (Optional) Configure model and temperature:
 
-4. (Optional) You would want to uncheck "Enable Sentence-level Segmenting" to get more fluent translation.
+   - Model (default is `gpt-4o`):
+
+     ```
+     -Dopenai.model=YOURMODELNAME
+     ```
+
+     Example: `-Dopenai.model=gpt-4o-mini`
+
+   - Temperature (default is `0`):
+
+     ```
+     -Dopenai.temperature=YOURTEMPERATURE
+     ```
+
+     Example: `-Dopenai.temperature=0.5`
+
+   Add these to the same configuration files as in step 3, or use as command line parameters.
+
+5. Open OmegaT Application. From Options > Machine Translation, select OpenAI Translate.
+
+6. (Optional) You would want to uncheck "Enable Sentence-level Segmenting" to get more fluent translation.
 
     ![](images/disable_sentence-level_segmenting.png)
