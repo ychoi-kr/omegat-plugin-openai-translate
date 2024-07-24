@@ -1,11 +1,15 @@
 package kr.ychoi.otplugin;
 
-import java.util.TreeMap;
-import java.util.Map;
+import java.util.*;
 import org.omegat.core.machinetranslators.BaseCachedTranslate;
 import org.omegat.util.Language;
 import org.omegat.util.WikiGet;
 import org.json.*;
+import org.omegat.gui.glossary.GlossaryEntry;
+import org.omegat.gui.glossary.GlossaryManager;
+import org.omegat.core.Core;
+import org.omegat.tokenizer.ITokenizer;
+import org.omegat.util.Token;
 
 /*
  * OpenAI Translate plugin for OmegaT
@@ -20,6 +24,13 @@ public class OpenAITranslate extends BaseCachedTranslate {
     private static final String API_KEY = System.getProperty("openai.api.key");
     private static final String MODEL = System.getProperty("openai.model", "gpt-4o");
     private static final float TEMPERATURE = Float.parseFloat(System.getProperty("openai.temperature", "0"));
+
+    private static final String SYSTEM_PROMPT_WITH_GLOSSARY = 
+        "Translate the following text from %s to %s using the provided glossary. Preserve the tags in the text.\n\n" +
+        "Glossary:\n%s\n";
+
+    private static final String SYSTEM_PROMPT_WITHOUT_GLOSSARY = 
+        "Translate the following text from %s to %s. Preserve the tags in the text.\n";
 
     @Override
     protected String getPreferenceName() {
@@ -45,17 +56,66 @@ public class OpenAITranslate extends BaseCachedTranslate {
             return cachedResult;
         }
         
-        JSONArray messages = new JSONArray();
+     // 텍스트 토큰화
+        Set<String> wordsInText = tokenizeText(text);
 
-        String lvSourceLang = sLang.getLanguageCode().substring(0, 2).toUpperCase();
-        String lvTargetLang = tLang.getLanguageCode().substring(0, 2).toUpperCase();
+        // 용어 검색
+        List<GlossaryEntry> glossaryEntries = searchGlossary(wordsInText);
 
-        String systemPrompt = String.format("You will be provided with a sentence in %s, and your task is to translate it into %s while preserving tags.", lvSourceLang, lvTargetLang);
+        // 시스템 프롬프트 및 사용자 프롬프트 작성
+        String systemPrompt = createSystemPrompt(sLang, tLang, glossaryEntries);
         String userPrompt = text;
 
+        // OpenAI API 요청
+        String translatedText = requestTranslation(systemPrompt, userPrompt);
+
+        // 캐시에 저장
+        putToCache(sLang, tLang, text, translatedText);
+
+        return translatedText;
+    }
+    
+    private Set<String> tokenizeText(String text) throws Exception {
+        ITokenizer tokenizer = Core.getProject().getSourceTokenizer();
+        Token[] tokens = tokenizer.tokenizeWords(text, ITokenizer.StemmingMode.NONE);
+        Set<String> words = new HashSet<>();
+        for (Token token : tokens) {
+            words.add(token.getTextFromString(text).toLowerCase());
+        }
+        return words;
+    }
+
+    private List<GlossaryEntry> searchGlossary(Set<String> wordsInText) throws Exception {
+        GlossaryManager glossaryManager = Core.getGlossaryManager();
+        List<GlossaryEntry> glossaryEntries = glossaryManager.getGlossaryEntries(String.join(" ", wordsInText));
+        List<GlossaryEntry> relevantEntries = new ArrayList<>();
+        for (GlossaryEntry entry : glossaryEntries) {
+            if (wordsInText.contains(entry.getSrcText().toLowerCase())) {
+                relevantEntries.add(entry);
+            }
+        }
+        return relevantEntries;
+    }
+
+    private String createSystemPrompt(Language sLang, Language tLang, List<GlossaryEntry> glossaryEntries) {
+        if (glossaryEntries.isEmpty()) {
+            return String.format(SYSTEM_PROMPT_WITHOUT_GLOSSARY, sLang.getLanguage(), tLang.getLanguage());
+        } else {
+            StringBuilder glossaryBuilder = new StringBuilder();
+            for (GlossaryEntry entry : glossaryEntries) {
+                String[] locTerms = entry.getLocTerms(false);
+                String locTerm = locTerms.length > 0 ? locTerms[0] : "";
+                glossaryBuilder.append(entry.getSrcText()).append("\t").append(locTerm).append("\n");
+            }
+            return String.format(SYSTEM_PROMPT_WITH_GLOSSARY, sLang.getLanguage(), tLang.getLanguage(), glossaryBuilder.toString());
+        }
+    }
+
+    private String requestTranslation(String systemPrompt, String userPrompt) throws Exception {
+        JSONArray messages = new JSONArray();
         messages.put(new JSONObject().put("role", "system").put("content", systemPrompt));
         messages.put(new JSONObject().put("role", "user").put("content", userPrompt));
-        
+
         Map<String, String> headers = new TreeMap<>();
         headers.put("Content-Type", "application/json");
         headers.put("Authorization", "Bearer " + API_KEY);
@@ -65,8 +125,7 @@ public class OpenAITranslate extends BaseCachedTranslate {
                 .put("messages", messages)
                 .put("temperature", TEMPERATURE)
                 .toString();
-        
-        System.out.println(body);
+
         try {
             String response = WikiGet.postJSON(API_URL, body, headers);
             JSONObject jsonResponse = new JSONObject(response);
@@ -75,9 +134,7 @@ public class OpenAITranslate extends BaseCachedTranslate {
                 JSONObject choice = choices.getJSONObject(0);
                 if (choice.has("message")) {
                     JSONObject message = choice.getJSONObject("message");
-                    String translatedText = message.getString("content").trim();
-                    putToCache(sLang, tLang, text, translatedText);  // 캐시에 저장
-                    return translatedText;
+                    return message.getString("content").trim();
                 }
             }
             return "Translation failed";
@@ -86,4 +143,3 @@ public class OpenAITranslate extends BaseCachedTranslate {
         }
     }
 }
-

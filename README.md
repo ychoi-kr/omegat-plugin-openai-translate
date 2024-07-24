@@ -1,11 +1,20 @@
 # OpenAI plug-in for OmegaT
 
-This plugin enables users to use machine translation provided by OpenAI in OmegaT CAT environment.
+This plug-in enables users to utilize OpenAI API for machine translation within the OmegaT CAT environment.
 
 ![](images/demo.png)
 
-This plug-in is based on [Naver Papago plug-in for OmegaT](https://github.com/ParanScreen/omegat-plugin-navertranslate).
+Originally based on the [Naver Papago plug-in for OmegaT](https://github.com/ParanScreen/omegat-plugin-navertranslate), this plug-in has evolved significantly.
+
 This software is open source software licensed under the GNU GPLv2. In addition, as a special exception, the copyright holders of this program give you permission to combine the program with free software programs or libraries that are released with code included in the standard release of [JSON-java Library](https://github.com/stleary/JSON-java) under the [JSON-java License](https://github.com/stleary/JSON-java/blob/master/LICENSE). You may copy and distribute such a system following the terms of the GNU GPL for this program and the licenses of the other code concerned. For detailed information, please refer to the LICENSE file.
+
+## Key Features
+
+- **Machine Translation with OpenAI**: Use the OpenAI API to translate text within OmegaT.
+- **Glossary Integration**: Automatically incorporates glossary terms into translations to improve accuracy.
+- **Tag Preservation**: Ensures that tags are preserved during the translation process, maintaining the structure and formatting of the original text.
+- **Built-in Caching**: Leverages OmegaT's built-in caching mechanism to improve translation request handling and efficiency.
+- **Configurable Model and Temperature**: Allows users to configure the OpenAI model and temperature settings via system properties.
 
 ## How to use
 
