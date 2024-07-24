@@ -26,11 +26,13 @@ public class OpenAITranslate extends BaseCachedTranslate {
     private static final float TEMPERATURE = Float.parseFloat(System.getProperty("openai.temperature", "0"));
 
     private static final String SYSTEM_PROMPT_WITH_GLOSSARY = 
-        "Translate the following text from %s to %s using the provided glossary. Preserve the tags in the text.\n\n" +
-        "Glossary:\n%s\n";
+	    "You are a translation tool integrated in a CAT (Computer-Assisted Translation) tool. Translate the following text from %s to %s using the provided glossary. Preserve the tags in the text and keep any segmentations intact.\n\n" +
+	    "Translate the following text exactly as it is, even if it seems incomplete or segmented. Do not ask for additional text or clarification.\n\n" +
+	    "Glossary:\n%s\n";
 
-    private static final String SYSTEM_PROMPT_WITHOUT_GLOSSARY = 
-        "Translate the following text from %s to %s. Preserve the tags in the text.\n";
+	private static final String SYSTEM_PROMPT_WITHOUT_GLOSSARY = 
+	    "You are a translation tool integrated in a CAT (Computer-Assisted Translation) tool. Translate the following text from %s to %s. Preserve the tags in the text and keep any segmentations intact.\n\n" +
+	    "Translate the following text exactly as it is, even if it seems incomplete or segmented. Do not ask for additional text or clarification.\n";
 
     @Override
     protected String getPreferenceName() {
