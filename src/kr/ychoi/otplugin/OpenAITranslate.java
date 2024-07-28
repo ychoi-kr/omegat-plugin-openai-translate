@@ -27,12 +27,12 @@ public class OpenAITranslate extends BaseCachedTranslate {
 
     private static final String SYSTEM_PROMPT_WITH_GLOSSARY = 
 	    "You are a translation tool integrated in a CAT (Computer-Assisted Translation) tool. Translate the following text from %s to %s using the provided glossary. Preserve the tags in the text and keep any segmentations intact.\n\n" +
-	    "Translate the following text exactly as it is, even if it seems incomplete or segmented. Do not ask for additional text or clarification.\n\n" +
+	    "Translate the following text exactly as it is, even if it seems incomplete or segmented. Handle line breaks appropriately and do not change the structure of the text. Do not repeat the original text. Ensure all tags are preserved and correctly placed in the translation. Do not ask for additional text or clarification.\n\n" +
 	    "Glossary:\n%s\n";
 
 	private static final String SYSTEM_PROMPT_WITHOUT_GLOSSARY = 
 	    "You are a translation tool integrated in a CAT (Computer-Assisted Translation) tool. Translate the following text from %s to %s. Preserve the tags in the text and keep any segmentations intact.\n\n" +
-	    "Translate the following text exactly as it is, even if it seems incomplete or segmented. Do not ask for additional text or clarification.\n";
+	    "Translate the following text exactly as it is, even if it seems incomplete or segmented. Handle line breaks appropriately and do not change the structure of the text. Do not repeat the original text. Ensure all tags are preserved and correctly placed in the translation. Do not ask for additional text or clarification.\n";
 
     @Override
     protected String getPreferenceName() {
@@ -66,7 +66,9 @@ public class OpenAITranslate extends BaseCachedTranslate {
 
         // 시스템 프롬프트 및 사용자 프롬프트 작성
         String systemPrompt = createSystemPrompt(sLang, tLang, glossaryEntries);
+        System.out.println(systemPrompt);
         String userPrompt = text;
+        System.out.println(userPrompt);
 
         // OpenAI API 요청
         String translatedText = requestTranslation(systemPrompt, userPrompt);
