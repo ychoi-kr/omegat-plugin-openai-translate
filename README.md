@@ -15,6 +15,7 @@ This software is open source software licensed under the GNU GPLv2. In addition,
 - **Tag Preservation**: Ensures that tags are preserved during the translation process, maintaining the structure and formatting of the original text.
 - **Built-in Caching**: Leverages OmegaT's built-in caching mechanism to improve translation request handling and efficiency.
 - **Configurable Model and Temperature**: Allows users to configure the OpenAI model and temperature settings via system properties.
+- **Custom User-Defined Prompts**: Enables users to insert additional custom instructions into the translation prompt, allowing for greater flexibility and control over translation output.
 
 ## How to use
 
@@ -63,8 +64,20 @@ This software is open source software licensed under the GNU GPLv2. In addition,
 
    Add these to the same configuration files as in step 3, or use as command line parameters.
 
-5. Open OmegaT Application. From Options > Machine Translation, select OpenAI Translate.
+5. (Optional) Add custom prompts:
 
-6. (Optional) You would want to uncheck "Enable Sentence-level Segmenting" to get more fluent translation.
+   You can now add a custom prompt to further control the translation output by adding the following line:
+    
+   ```
+   -Dcustom.prompt="YOUR_CUSTOM_PROMPT"
+   ```
+
+   Example: `-Dcustom.prompt="Please translate with a formal tone and prioritize technical accuracy."`
+
+   Add this line to the same configuration files as in step 3, or use it as a command line parameter.
+
+6. Open OmegaT Application. From Options > Machine Translation, select OpenAI Translate.
+
+7. (Optional) You would want to uncheck "Enable Sentence-level Segmenting" to get more fluent translation.
 
     ![](images/disable_sentence-level_segmenting.png)
