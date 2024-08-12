@@ -24,15 +24,10 @@ public class OpenAITranslate extends BaseCachedTranslate {
     private static final String API_KEY = System.getProperty("openai.api.key");
     private static final String MODEL = System.getProperty("openai.model", "gpt-4o");
     private static final float TEMPERATURE = Float.parseFloat(System.getProperty("openai.temperature", "0"));
+    private static final String CUSTOM_PROMPT = System.getProperty("custom.prompt", "");
 
-    private static final String SYSTEM_PROMPT_WITH_GLOSSARY = 
-	    "You are a translation tool integrated in a CAT (Computer-Assisted Translation) tool. Translate the following text from %s to %s using the provided glossary. Preserve the tags in the text and keep any segmentations intact.\n\n" +
-	    "Translate the following text exactly as it is, even if it seems incomplete or segmented. Handle line breaks appropriately and do not change the structure of the text. Do not repeat the original text. Ensure all tags are preserved and correctly placed in the translation. Do not ask for additional text or clarification.\n\n" +
-	    "Glossary:\n%s\n";
-
-	private static final String SYSTEM_PROMPT_WITHOUT_GLOSSARY = 
-	    "You are a translation tool integrated in a CAT (Computer-Assisted Translation) tool. Translate the following text from %s to %s. Preserve the tags in the text and keep any segmentations intact.\n\n" +
-	    "Translate the following text exactly as it is, even if it seems incomplete or segmented. Handle line breaks appropriately and do not change the structure of the text. Do not repeat the original text. Ensure all tags are preserved and correctly placed in the translation. Do not ask for additional text or clarification.\n";
+    private static final String BASE_PROMPT = 
+            "You are a translation tool integrated in a CAT (Computer-Assisted Translation) tool. Translate the following text from %s to %s. Preserve the tags in the text and keep any segmentations intact.\n\n";
 
     @Override
     protected String getPreferenceName() {
@@ -58,7 +53,7 @@ public class OpenAITranslate extends BaseCachedTranslate {
             return cachedResult;
         }
         
-     // 텍스트 토큰화
+        // 텍스트 토큰화
         Set<String> wordsInText = tokenizeText(text);
 
         // 용어 검색
@@ -102,17 +97,27 @@ public class OpenAITranslate extends BaseCachedTranslate {
     }
 
     private String createSystemPrompt(Language sLang, Language tLang, List<GlossaryEntry> glossaryEntries) {
-        if (glossaryEntries.isEmpty()) {
-            return String.format(SYSTEM_PROMPT_WITHOUT_GLOSSARY, sLang.getLanguage(), tLang.getLanguage());
-        } else {
-            StringBuilder glossaryBuilder = new StringBuilder();
+        StringBuilder promptBuilder = new StringBuilder();
+
+        // 기본 지침 추가
+        promptBuilder.append(String.format(BASE_PROMPT, sLang.getLanguage(), tLang.getLanguage()));
+
+        // Glossary가 있을 경우 추가
+        if (!glossaryEntries.isEmpty()) {
+            promptBuilder.append("Glossary:\n");
             for (GlossaryEntry entry : glossaryEntries) {
                 String[] locTerms = entry.getLocTerms(false);
                 String locTerm = locTerms.length > 0 ? locTerms[0] : "";
-                glossaryBuilder.append(entry.getSrcText()).append("\t").append(locTerm).append("\n");
+                promptBuilder.append(entry.getSrcText()).append("\t").append(locTerm).append("\n");
             }
-            return String.format(SYSTEM_PROMPT_WITH_GLOSSARY, sLang.getLanguage(), tLang.getLanguage(), glossaryBuilder.toString());
         }
+
+        // 사용자 정의 프롬프트 추가
+        if (!CUSTOM_PROMPT.isEmpty()) {
+            promptBuilder.append("\n").append(CUSTOM_PROMPT).append("\n");
+        }
+
+        return promptBuilder.toString();
     }
 
     private String requestTranslation(String systemPrompt, String userPrompt) throws Exception {
