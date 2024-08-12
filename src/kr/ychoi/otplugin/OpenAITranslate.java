@@ -6,10 +6,9 @@ import org.omegat.util.Language;
 import org.omegat.util.WikiGet;
 import org.json.*;
 import org.omegat.gui.glossary.GlossaryEntry;
-import org.omegat.gui.glossary.GlossaryManager;
+import org.omegat.gui.glossary.GlossarySearcher;
 import org.omegat.core.Core;
-import org.omegat.tokenizer.ITokenizer;
-import org.omegat.util.Token;
+import org.omegat.core.data.SourceTextEntry;
 
 /*
  * OpenAI Translate plugin for OmegaT
@@ -44,20 +43,23 @@ public class OpenAITranslate extends BaseCachedTranslate {
 
     @Override
     protected String translate(Language sLang, Language tLang, String text) throws Exception {
-        if (API_KEY == null) {
-            return "API key not found";
+        // 프로젝트에서 SourceTextEntry를 찾음
+        List<SourceTextEntry> entries = Core.getProject().getAllEntries();
+        SourceTextEntry matchingEntry = null;
+
+        for (SourceTextEntry entry : entries) {
+            if (entry.getSrcText().equals(text)) {
+                matchingEntry = entry;
+                break;
+            }
         }
 
-        String cachedResult = getCachedTranslation(sLang, tLang, text);
-        if (cachedResult != null) {
-            return cachedResult;
+        List<GlossaryEntry> glossaryEntries = new ArrayList<>();
+        if (matchingEntry != null) {
+            // GlossarySearcher를 사용하여 용어집 검색 수행
+            GlossarySearcher glossarySearcher = new GlossarySearcher(Core.getProject().getSourceTokenizer(), sLang, true);
+            glossaryEntries = glossarySearcher.searchSourceMatches(matchingEntry, Core.getGlossaryManager().getGlossaryEntries(text));
         }
-        
-        // 텍스트 토큰화
-        Set<String> wordsInText = tokenizeText(text);
-
-        // 용어 검색
-        List<GlossaryEntry> glossaryEntries = searchGlossary(wordsInText);
 
         // 시스템 프롬프트 및 사용자 프롬프트 작성
         String systemPrompt = createSystemPrompt(sLang, tLang, glossaryEntries);
@@ -66,35 +68,9 @@ public class OpenAITranslate extends BaseCachedTranslate {
         System.out.println(userPrompt);
 
         // OpenAI API 요청
-        String translatedText = requestTranslation(systemPrompt, userPrompt);
-
-        // 캐시에 저장
-        putToCache(sLang, tLang, text, translatedText);
-
-        return translatedText;
-    }
-    
-    private Set<String> tokenizeText(String text) throws Exception {
-        ITokenizer tokenizer = Core.getProject().getSourceTokenizer();
-        Token[] tokens = tokenizer.tokenizeWords(text, ITokenizer.StemmingMode.NONE);
-        Set<String> words = new HashSet<>();
-        for (Token token : tokens) {
-            words.add(token.getTextFromString(text).toLowerCase());
-        }
-        return words;
+        return requestTranslation(systemPrompt, userPrompt);
     }
 
-    private List<GlossaryEntry> searchGlossary(Set<String> wordsInText) throws Exception {
-        GlossaryManager glossaryManager = Core.getGlossaryManager();
-        List<GlossaryEntry> glossaryEntries = glossaryManager.getGlossaryEntries(String.join(" ", wordsInText));
-        List<GlossaryEntry> relevantEntries = new ArrayList<>();
-        for (GlossaryEntry entry : glossaryEntries) {
-            if (wordsInText.contains(entry.getSrcText().toLowerCase())) {
-                relevantEntries.add(entry);
-            }
-        }
-        return relevantEntries;
-    }
 
     private String createSystemPrompt(Language sLang, Language tLang, List<GlossaryEntry> glossaryEntries) {
         StringBuilder promptBuilder = new StringBuilder();
