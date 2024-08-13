@@ -1,6 +1,6 @@
-# OpenAI plug-in for OmegaT
+# OpenAI Plug-in for OmegaT
 
-This plug-in enables users to utilize OpenAI API for machine translation within the OmegaT CAT environment.
+This plug-in enables users to utilize the OpenAI API for machine translation within the OmegaT CAT environment.
 
 ![](images/demo.png)
 
@@ -14,70 +14,48 @@ This software is open source software licensed under the GNU GPLv2. In addition,
 - **Glossary Integration**: Automatically incorporates glossary terms into translations to improve accuracy.
 - **Tag Preservation**: Ensures that tags are preserved during the translation process, maintaining the structure and formatting of the original text.
 - **Built-in Caching**: Leverages OmegaT's built-in caching mechanism to improve translation request handling and efficiency.
-- **Configurable Model and Temperature**: Allows users to configure the OpenAI model and temperature settings via system properties.
-- **Custom User-Defined Prompts**: Enables users to insert additional custom instructions into the translation prompt, allowing for greater flexibility and control over translation output.
+- **Configurable Model and Temperature via GUI**: Users can now configure the OpenAI model and temperature settings directly through the OmegaT GUI.
+- **Custom User-Defined Prompts via GUI**: Easily add custom instructions into the translation prompt through the settings UI, allowing for greater flexibility and control over translation output.
 
-## How to use
+## How to Use
 
-1. Get your API key from [OpenAI](https://platform.openai.com/account/api-keys).
+### 1. Install the Plug-in
 
-2. Copy the plug-in file into directory:
+1. Download the plug-in file.
+2. Copy the plug-in file to the appropriate directory based on your operating system:
 
-    - Windows: Copy the plug-in file into %SystemDrive%%ProgramFiles%\OmegaT\plugins directory.
-    - macOS: Copy the plug-in file into /Applications/OmegaT.app/Contents/Java/plugins directory.
-    - GNU/Linux: Copy the plug-in file under the directory that OmegaT installed.
+    - **Windows**: Copy the plug-in file into `%SystemDrive%%ProgramFiles%\OmegaT\plugins` directory.
+    - **macOS**: Copy the plug-in file into `/Applications/OmegaT.app/Contents/Java/plugins` directory.
+    - **GNU/Linux**: Copy the plug-in file under the directory where OmegaT is installed.
 
-3. Set your OpenAI key.
+### 2. Configure API Key and Settings via the OmegaT UI
 
-    - Windows: Open the file %SystemDrive%\%ProgramFiles%\OmegaT\OmegaT.I4J.ini and add this line:
-    ```
-    -Dopenai.api.key=YOURAPIKEY
-    ```
+1. **Open the Preferences Window**:
+    - Open OmegaT.
+    - Go to `Options > Preferences`.
 
-    - macOS: Open the file /Applications/OmegaT.app/Contents/Resources/Configuration.properties with text editor and add this line:
-    ```
-    openai.api.key=YOURAPIKEY
-    ```
-   
-    - In case of running the program with command line prompt, add this parameter:
-    ```
-    -Dopenai.api.key=YOURAPIKEY
-    ```
-   
-4. (Optional) Configure model and temperature:
+2. **Navigate to Machine Translation**:
+    - In the Preferences window, select `Machine Translation` from the left-hand menu.
 
-   - Model (default is `gpt-4o`):
+3. **Select OpenAI Translate**:
+    - In the list of available machine translation services, click on `OpenAI Translate` or `OpenAI Translate (API Key Required)`.
 
-     ```
-     -Dopenai.model=YOURMODELNAME
-     ```
+4. **Configure the Plug-in**:
+    - Click on the "Configure" button to open the configuration window.
+    - In the configuration window, enter your OpenAI API key in the "API Key" field.
+    - Specify the desired OpenAI model (e.g., `gpt-4o-mini`) and temperature setting. The default model is `gpt-4o`, and the default temperature is `0`.
+    - If you have specific instructions or a style you want the translation to follow, enter this in the "Custom Prompt" field.
+      - Example: `Please translate with a formal tone and prioritize technical accuracy.`
 
-     Example: `-Dopenai.model=gpt-4o-mini`
+5. **Save Settings**:
+    - After entering your settings, click "OK" to save your preferences. These settings will be stored and automatically applied each time you use the OpenAI translation service within OmegaT.
 
-   - Temperature (default is `0`):
+![](images/configuration.png)
 
-     ```
-     -Dopenai.temperature=YOURTEMPERATURE
-     ```
+### 3. Start Translating
 
-     Example: `-Dopenai.temperature=0.5`
+1. Open your project in OmegaT.
+2. Use the OpenAI translation service by selecting it from the `Options > Machine Translation` menu.
+3. If desired, you may want to uncheck "Enable Sentence-level Segmenting" in the Options menu to achieve more fluent translations.
 
-   Add these to the same configuration files as in step 3, or use as command line parameters.
-
-5. (Optional) Add custom prompts:
-
-   You can now add a custom prompt to further control the translation output by adding the following line:
-    
-   ```
-   -Dcustom.prompt="YOUR_CUSTOM_PROMPT"
-   ```
-
-   Example: `-Dcustom.prompt="Please translate with a formal tone and prioritize technical accuracy."`
-
-   Add this line to the same configuration files as in step 3, or use it as a command line parameter.
-
-6. Open OmegaT Application. From Options > Machine Translation, select OpenAI Translate.
-
-7. (Optional) You would want to uncheck "Enable Sentence-level Segmenting" to get more fluent translation.
-
-    ![](images/disable_sentence-level_segmenting.png)
+![](images/disable_sentence-level_segmenting.png)

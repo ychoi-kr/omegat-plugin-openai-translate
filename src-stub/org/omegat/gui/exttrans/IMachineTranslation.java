@@ -22,6 +22,8 @@
 
 package org.omegat.gui.exttrans;
 
+import java.awt.Window;
+
 import org.omegat.util.Language;
 
 public interface IMachineTranslation
@@ -29,4 +31,8 @@ public interface IMachineTranslation
     String getName();
 
     String getTranslation(Language sLang, Language tLang, String text) throws Exception;
+
+	void showConfigurationUI(Window parent);
+
+	boolean isConfigurable();
 }
