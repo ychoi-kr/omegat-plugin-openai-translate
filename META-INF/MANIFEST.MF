@@ -1,5 +1,7 @@
 Manifest-Version: 1.0
 OmegaT-Plugin: true
+Implementation-Version: 0.5.2-responses-custom
+Implementation-Title: OpenAI Translate (custom build: Responses API + model dropdown)
 
 Name: kr.ychoi.otplugin.OpenAITranslate
 OmegaT-Plugin: MachineTranslator
